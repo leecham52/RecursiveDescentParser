@@ -17,6 +17,8 @@ int k = 0;
 int te = 0;
 int fl = 0;
 int f = 0;
+string suitable = "OK"; //줄마다 OK, WARNING, ERROR default OK
+int cur_ident[];
 
 #define IDENT 10
 #define CONST 11
@@ -28,6 +30,7 @@ int f = 0;
 #define RPAREN 19
 #define EOF 99
 
+bool checkWhiteSpace(char c);
 bool checkLetter(char c);
 bool checkDigit(char c);
 bool checkIdent(const char c[]);
@@ -42,8 +45,10 @@ int checkToken(const char t[]);
 
 void lexical(string str);
 void printLexCount(int* tk);
-void RecursiveDescentParsing();
+void lineSuitable();
 
+/*
+void RecursiveDescentParsing();
 class Node {
     public:
         string parse;
@@ -68,7 +73,7 @@ class Node {
             right = NULL;
         }
         //뭔가 있어야함. 함수로 next_token을 이용한 것으로.
-};
+};*/
 
 int main(int argc, char* argv[]) {
     if (argc < 2)
@@ -90,7 +95,7 @@ int main(int argc, char* argv[]) {
         k++;
     }
     in_Fp.close();
-    program(*tokens);
+    program(tokens);
     return 0;
 }
 
@@ -101,7 +106,7 @@ void lexical(string str){
     string notLit;
     string tempstr;
     for(int i = 0; i<str.length(); i++){
-        if(isspace(str[i]) == 0){
+        if(checkWhiteSpace(str[i])){
             tempstr += str[i]; //공백을 뺀 줄을 가져온다. id1 = id2 + 2; => id1=id2+2;
         }
     }
@@ -198,17 +203,24 @@ void printLexCount(int** tk){
     }
     cout<<"ID: "<<id_count<<"; CONST: "<<const_count<<"; OP: "<<op_count<<";"<<endl;
 }
+//ascii code 32이하인지 확인
+bool checkWhiteSpace(char c){
+    if(c <= 32){
+        return true;
+    }
+    return false;
+}
 bool checkLetter(char c) {
-    if (c >= 65 && c <= 90) {  // refer to ascii code
+    if (c >= 65 && c <= 90) {  
 		return true;
 	}
-	else if (c >= 97 && c <= 122) { // refer to ascii code
+	else if (c >= 97 && c <= 122) { 
 		return true;
 	}
 	else return false;
 }
 bool checkDigit(char c){
-    if (c >= 48 && c <= 57) { // refer to ascii code
+    if (c >= 48 && c <= 57) { 
 		return true;
 	}
 	else return false;
@@ -250,7 +262,7 @@ bool checkConst(const char c[]){
 bool checkAddOp(const char c[]){
     if((int)strlen(c) == 2){
         if((c[0] == '+' && c[1] == '+') || (c[0] == '-' && c[1] == '-')){
-            return true; //Warning 받아갈만한것을 넣어주면 될듯,
+            return true;
         }
     }
     if((int)strlen(c) != 1){
@@ -331,6 +343,7 @@ int checkToken(const char t[]){
 	}
     else return EOF;
 }
+/*
 void RecursiveDescentParsing(){    
     Node* program = new Node("program");
     Node* statements = new Node("statements");
@@ -369,7 +382,7 @@ void RecursiveDescentParsing(){
     factor_tail->center = factor;
     factor_tail->right = factor_tail;
 }
-
+*/
 //Assignment 1 조건에 맞는 Recursive-Descent Parsing
 //<program> -> <statements>
 void program(int** tks) {
@@ -449,8 +462,9 @@ void factor_tail(int** tks) {
 void const_(int** tks){
     cout<<"Enter <const>"<<endl;
     if(tks[fl][f] == CONST){
-        f++;
-        if(sizeof(tks[fl]))
+        if(!(tks[fl][f] == NULL)){ // 맨 끝은 identifier 아니면 const로 끝난다.
+            f++;    
+        }
     }
     cout<<"Exit <const>"<<endl;
 }
@@ -458,7 +472,9 @@ void const_(int** tks){
 void ident(int** tks){
     cout<<"Enter <ident>"<<endl;
     if(tks[fl][f] == IDENT){
-        f++;
+        if(!(tks[fl][f] == NULL)){
+            f++;
+        }
     }
     cout<<"Exit <ident>"<<endl;
 }
@@ -471,37 +487,46 @@ void assignment_op(int** tks){
     cout<<"Exit <assignmnet_op>"<<endl;
 }
 //<semi_colon> -> ;
+//여기서 줄이 바뀐다, 2차원 배열이 바뀌는 것,
 void semi_colon(int** tks){
     cout<<"Enter <semi_colon>"<<endl;
     if(tks[fl][f] == SEMI_COLON){
-        if(sizeof(tks[fl])/sizeof(int) == f+1){
+        if(sizeof(tks[fl])/sizeof(int) == f+1){ // 배열 길이, 
             fl++;
+            f = 0;
         }
-        else f++;
     }
     cout<<"Exit <semi_colon>"<<endl;
 }
 //<add_op> -> (+|-)
 void add_op(int** tks){
     cout<<"Enter <add_op>"<<endl;
-    lex();
+    if(tks[fl][f] == ADD_OP){
+        f++;
+    }
     cout<<"Exit <add_op>"<<endl;
 }
 //<mult_op> -> (*|/)
 void mult_op(int** tks){
     cout<<"Enter <mult_op>"<<endl;
-    lex();
+    if(tks[fl][f] == MUL_OP){
+        f++;
+    }
     cout<<"Exit <mult_op>"<<endl;
 }
 //<left_paren> -> (
 void left_paren(int** tks){
     cout<<"Enter <left_paren>"<<endl;
-    lex();
+    if(tks[fl][f] == LPAREN){
+        f++;
+    }
     cout<<"Exit <left_paren>"<<endl;
 }
 //<right_paren> -> )
 void right_paren(int** tks){
     cout<<"Enter <right_paren>"<<endl;
-    lex();
+    if(tks[fl][f] == RPAREN){
+        f++;
+    }
     cout<<"Exit <right_paren>"<<endl;
 }   
