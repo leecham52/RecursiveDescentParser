@@ -17,7 +17,8 @@ int k = 0;
 int te = 0;
 int fl = 0;
 int f = 0;
-string suitable = "OK"; //줄마다 OK, WARNING, ERROR default OK
+string* dup_op;
+int s = 0;
 int cur_ident[];
 
 #define IDENT 10
@@ -44,36 +45,7 @@ bool checkSemiColon(const char c[]);
 int checkToken(const char t[]);
 
 void lexical(string str);
-void printLexCount(int* tk);
-void lineSuitable();
-
-/*
-void RecursiveDescentParsing();
-class Node {
-    public:
-        string parse;
-        bool nonTorT; //true면 nonTerminal, false면 Terminal
-        int terminalVal;
-        Node* left;
-        Node* center;
-        Node* right;
-        Node(string val){
-            parse = val;
-            nonTorT = true;
-            left = NULL;
-            center = NULL;
-            right = NULL;
-        }
-        Node(string val, int terminal){
-            parse = val;
-            nonTorT = false;
-            terminalVal = terminal;
-            left = NULL;
-            center = NULL;
-            right = NULL;
-        }
-        //뭔가 있어야함. 함수로 next_token을 이용한 것으로.
-};*/
+void printResult(int** tk, string** lex);
 
 int main(int argc, char* argv[]) {
     if (argc < 2)
@@ -89,13 +61,13 @@ int main(int argc, char* argv[]) {
         cout<< "ERROR - cannot open front.in" << endl;
     while(!in_Fp.eof()){
         getline(in_Fp, in[k]); //한 줄씩 입력 받음
-        cout << in[k] << endl;
         lexical(in[k]);
-        printLexCount(tokens[k]);
         k++;
     }
     in_Fp.close();
-    program(tokens);
+    program(tokens); //RecursiveDescentParser 하기
+    printResult(tokens, lexeme);
+
     return 0;
 }
 
@@ -185,23 +157,33 @@ void lexical(string str){
         }*/
     }
 }
-//ID, CONST, OP의 개수를 나타내주는 함수
-void printLexCount(int** tk){
-    int id_count = 0;
-    int const_count = 0;
-    int op_count = 0;
-    for(int i =0; i< sizeof(tk[k])/sizeof(int); i++){
-        if(tk[k][i] == IDENT){
-            id_count++;
+//출력, ID, CONST, OP의 개수를 나타내주는 함수
+void printResult(int** tk, string** lex){
+    for(int k = 0; k< sizeof(tk)/sizeof(tk[0]);k++){
+        int id_count = 0;
+        int const_count = 0;
+        int op_count = 0;
+        string m;
+        m.clear();
+        for(int i =0; i< sizeof(tk[k])/sizeof(int); i++){
+            
+            m += lex[k][i];
+            m += " ";
+            if(tk[k][i] == IDENT){
+                id_count++;
+            }
+            else if(tk[k][i] == CONST){
+                const_count++;
+            }
+            else if(tk[k][i] == ADD_OP || tk[k][i] == MUL_OP){
+                op_count++;
+            }
         }
-        else if(tk[k][i] == CONST){
-            const_count++;
-        }
-        else if(tk[k][i] == ADD_OP || tk[k][i] == MUL_OP){
-            op_count++;
-        }
+        cout<<m<<endl;
+        cout<<"ID: "<<id_count<<"; CONST: "<<const_count<<"; OP: "<<op_count<<";"<<endl;
+        //OK, WARNING, Error
+
     }
-    cout<<"ID: "<<id_count<<"; CONST: "<<const_count<<"; OP: "<<op_count<<";"<<endl;
 }
 //ascii code 32이하인지 확인
 bool checkWhiteSpace(char c){
@@ -343,46 +325,6 @@ int checkToken(const char t[]){
 	}
     else return EOF;
 }
-/*
-void RecursiveDescentParsing(){    
-    Node* program = new Node("program");
-    Node* statements = new Node("statements");
-    program->left = statements;
-    Node* statement = new Node("statement");
-    Node* semi_colon = new Node("semi_colon", SEMI_COLON);
-    statements-> left = statement;
-    statements-> center = semi_colon;
-    statements-> right = statements;
-    Node* ident = new Node("ident", IDENT);
-    Node* assign_op = new Node("assign_op", ASSIGN_OP);
-    Node* expression = new Node("expression");
-    statement->left = ident;
-    statement->center = assign_op;
-    statement->right = expression;
-    Node* term = new Node("term");
-    Node* term_tail = new Node("term_tail");
-    expression->left = term;
-    expression->center = term_tail;
-    Node* factor = new Node("factor");
-    Node* factor_tail = new Node("factor_tail");
-    term->left = factor;
-    term->center = factor_tail;
-    Node* add_op = new Node("add_op", ADD_OP);
-    Node* mul_op = new Node("mul_op", MUL_OP);
-    term_tail->left = add_op;
-    term_tail->center = term;
-    term_tail->right = term_tail;
-    Node* lparen = new Node("lparen", LPAREN);
-    Node* rparen = new Node("rparen", RPAREN);
-    Node* const_ = new Node("const", CONST);
-    factor->left = lparen;
-    factor->center = expression;
-    factor->right = rparen;
-    factor_tail->left = mul_op;
-    factor_tail->center = factor;
-    factor_tail->right = factor_tail;
-}
-*/
 //Assignment 1 조건에 맞는 Recursive-Descent Parsing
 //<program> -> <statements>
 void program(int** tks) {
@@ -501,6 +443,15 @@ void semi_colon(int** tks){
 //<add_op> -> (+|-)
 void add_op(int** tks){
     cout<<"Enter <add_op>"<<endl;
+    if(lexeme[fl][f] == "++"){
+        lexeme[fl][f] = "+";
+        dup_op[s] = to_string(fl) + "+";
+        s++;
+    }else if(lexeme[fl][f] == "--"){
+        lexeme[fl][f] = "-";
+        dup_op[s] = to_string(fl)+"-";
+        s++;
+    }
     if(tks[fl][f] == ADD_OP){
         f++;
     }
@@ -509,6 +460,15 @@ void add_op(int** tks){
 //<mult_op> -> (*|/)
 void mult_op(int** tks){
     cout<<"Enter <mult_op>"<<endl;
+    if(lexeme[fl][f] == "**"){
+        lexeme[fl][f] = "*";
+        dup_op[s] = to_string(fl)+"*";
+        s++;
+    }else if(lexeme[fl][f] == "//"){
+        lexeme[fl][f] = "/";
+        dup_op[s] = to_string(fl)+"/"; //몇 번줄에서 일어났는지,
+        s++;
+    }
     if(tks[fl][f] == MUL_OP){
         f++;
     }
