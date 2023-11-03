@@ -11,15 +11,15 @@ using namespace std;
 //아쉽지만, 전역변수로 받기
 //2차원 배열로 값 받기
 
-int* tokens[];
-string* lexeme[];
+int** tokens;
+string** lexeme;
 int k = 0;
 int te = 0;
 int fl = 0;
 int f = 0;
 string* dup_op;
 int s = 0;
-int cur_ident[];
+int* cur_ident;
 
 #define IDENT 10
 #define CONST 11
@@ -29,7 +29,6 @@ int cur_ident[];
 #define MUL_OP 16
 #define LPAREN 18
 #define RPAREN 19
-#define EOF 99
 
 bool checkWhiteSpace(char c);
 bool checkLetter(char c);
@@ -43,20 +42,38 @@ bool checkLparen(const char c[]);
 bool checkRparen(const char c[]);
 bool checkSemiColon(const char c[]);
 int checkToken(const char t[]);
+void program(int** tks);
+void statements(int** tks);
+void statement(int** tks);
+void expression(int** tks);
+void term(int** tks);
+void term_tail(int** tks);
+void factor(int** tks);
+void factor_tail(int** tks);
+void const_(int** tks);
+void ident(int** tks);
+void assignment_op(int** tks);
+void semi_colon(int** tks);
+void add_op(int** tks);
+void mult_op(int** tks);
+void left_paren(int** tks);
+void right_paren(int** tks);
 
 void lexical(string str);
 void printResult(int** tk, string** lex);
 
+
 int main(int argc, char* argv[]) {
-    if (argc < 2)
+    
+    /*if (argc < 2)
 	{
 		cout << "파일 입력 오류" << endl;
 		return 0;
-	}
+	}*/
     string* in;
     
     //c++에 맞춰서 변환, string으로 낑겨 받으면 좋을수도 아닐수도
-    ifstream in_Fp(argv[1]);
+    ifstream in_Fp("input1.txt");
     if (!in_Fp.is_open())
         cout<< "ERROR - cannot open front.in" << endl;
     while(!in_Fp.eof()){
@@ -72,7 +89,7 @@ int main(int argc, char* argv[]) {
 }
 
 void lexical(string str){
-    int next_token;
+    int next_token = 0;
     string token_string;
     string tok;
     string notLit;
@@ -93,7 +110,7 @@ void lexical(string str){
         }
         next_token = checkToken(tok.c_str()); // 여기서 identifier, const 걸러서 token화된다.
         //lexeme이랑 token을 어딘가 저장을 해둬야한다.
-        if(!tok.empty() && next_token != NULL){
+        if(!tok.empty() && next_token != 0){
             lexeme[k][te] = tok;
             tokens[k][te] = next_token;
             te++;    
@@ -143,18 +160,11 @@ void lexical(string str){
             i++;
         }
         next_token = checkToken(notLit.c_str());
-        if(!notLit.empty() && next_token != NULL){
+        if(!notLit.empty() && next_token != 0){
             lexeme[k][te] = notLit;
             tokens[k][te] = next_token;
             te++;
         }
-        /*
-        if(checkToken(tok.c_str()) != EOF){
-               
-        }
-        else {
-            tok = cpytok;
-        }*/
     }
 }
 //출력, ID, CONST, OP의 개수를 나타내주는 함수
@@ -323,7 +333,7 @@ int checkToken(const char t[]){
     else if (checkSemiColon(t)) {
 		return SEMI_COLON;
 	}
-    else return EOF;
+    else return 0;
 }
 //Assignment 1 조건에 맞는 Recursive-Descent Parsing
 //<program> -> <statements>
@@ -404,8 +414,8 @@ void factor_tail(int** tks) {
 void const_(int** tks){
     cout<<"Enter <const>"<<endl;
     if(tks[fl][f] == CONST){
-        if(!(tks[fl][f] == NULL)){ // 맨 끝은 identifier 아니면 const로 끝난다.
-            f++;    
+        if(!(fl == sizeof(tks)/sizeof(tks[fl]) - 1)){
+            f++;
         }
     }
     cout<<"Exit <const>"<<endl;
@@ -414,7 +424,7 @@ void const_(int** tks){
 void ident(int** tks){
     cout<<"Enter <ident>"<<endl;
     if(tks[fl][f] == IDENT){
-        if(!(tks[fl][f] == NULL)){
+        if(!(fl == sizeof(tks)/sizeof(tks[fl]) - 1)){
             f++;
         }
     }
