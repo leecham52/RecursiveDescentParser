@@ -10,6 +10,7 @@
 #include <string.h>
 using namespace std;
 
+<<<<<<< HEAD
 vector<vector<int>> tokens;
 vector<vector<string>> lexeme;
 int fl = 0;
@@ -27,6 +28,20 @@ struct op {
 vector<id> ide;
 stack<int> num;
 stack<op> oper;
+=======
+//아쉽지만, 전역변수로 받기
+//2차원 배열로 값 받기
+
+int* tokens[100];
+string* lexeme[100];
+int k = 0;
+int te = 0;
+int fl = 0;
+int f = 0;
+string* dup_op;
+int s = 0;
+int cur_ident[100];
+>>>>>>> 6a9cd65a158fa2226a362cddb96e30fb9cc9cee8
 
 #define IDENT 10
 #define CONST 11
@@ -69,6 +84,7 @@ void left_paren(vector<vector<int>> tks);
 void right_paren(vector<vector<int>> tks);
 
 void lexical(string str);
+<<<<<<< HEAD
 void calString();
 void calIdent(vector<vector<int>> tk, vector<vector<string>> lex, vector<id>& ident);
 void printResult(vector<vector<int>> tk, vector<vector<string>> lex);
@@ -87,6 +103,44 @@ int main(int argc, char* argv[]) {
     while (!in_Fp.eof()) {
         getline(in_Fp, in); //한 줄씩 입력 받음
         lexical(in);
+=======
+void printResult(int** tk, string** lex);
+void program(int** tks);
+void statements(int** tks);
+void statement(int** tks);
+void expression(int** tks);
+void term(int** tks);
+void term_tail(int** tks);
+void factor(int** tks);
+void factor_tail(int** tks);
+void const_(int** tks);
+void ident(int** tks);
+void assignment_op(int** tks);
+void semi_colon(int** tks);
+void add_op(int** tks);
+void mult_op(int** tks);
+void left_paren(int** tks);
+void right_paren(int** tks);
+
+
+int main(int argc, char* argv[]) {
+    if (argc < 2)
+    {
+        cout << "파일 입력 오류" << endl;
+        return 0;
+    }
+    string in[100];
+
+    //c++에 맞춰서 변환, string으로 낑겨 받으면 좋을수도 아닐수도
+    ifstream in_Fp;
+    in_Fp.open(argv[1]);
+    if (!in_Fp.is_open())
+        cout << "ERROR - cannot open front.in" << endl;
+    while (!in_Fp.eof()) {
+        getline(in_Fp, in[k]); //한 줄씩 입력 받음
+        lexical(in[k]);
+        k++;
+>>>>>>> 6a9cd65a158fa2226a362cddb96e30fb9cc9cee8
     }
     in_Fp.close();
     program(tokens); //RecursiveDescentParser 하기
@@ -97,6 +151,7 @@ int main(int argc, char* argv[]) {
 }
 
 void lexical(string str) {
+<<<<<<< HEAD
     int next_token = 0;
     string tok;
     string notLit;
@@ -111,16 +166,35 @@ void lexical(string str) {
         }
     }
     for (int i = 0; i < token_string.length();) {
+=======
+    int next_token;
+    string token_string;
+    string tok;
+    string notLit;
+    string tempstr = "";
+    for (int i = 0; i < str.length(); i++) {
+        if (checkWhiteSpace(str[i])) {
+            tempstr += str[i]; //공백을 뺀 줄을 가져온다. id1 = id2 + 2; => id1=id2+2;
+        }
+    }
+    for (int i = 0; i < tempstr.length();) {
+>>>>>>> 6a9cd65a158fa2226a362cddb96e30fb9cc9cee8
         tok.clear();
         notLit.clear();
 
         //identifier, const 2가지 경우를 걸러서 저장
+<<<<<<< HEAD
         while ((checkLetter(token_string[i]) || checkDigit(token_string[i]) || token_string[i] == '_')) {
             tok += token_string[i];
+=======
+        while ((checkLetter(tempstr[i]) || checkDigit(tempstr[i] || tempstr[i] == '_'))) {
+            tok += tempstr[i];
+>>>>>>> 6a9cd65a158fa2226a362cddb96e30fb9cc9cee8
             i++;
         }
         next_token = checkToken(tok.c_str()); // 여기서 identifier, const 걸러서 token화된다.
         //lexeme이랑 token을 어딘가 저장을 해둬야한다.
+<<<<<<< HEAD
         if (!tok.empty() && next_token != 0) {
             lex.push_back(tok);
             n_t.push_back(next_token);
@@ -268,22 +342,94 @@ void calIdent(vector<vector<int>> tk, vector<vector<string>> lex, vector<id>& id
         if (tk[k][0] == IDENT) {
             ident.push_back({ lex[k][0], num.top() });
             num.pop();
+=======
+        if (!tok.empty() && next_token != NULL) {
+            lexeme[k][te] = tok;
+            tokens[k][te] = next_token;
+            te++;
+        }
+        if (tempstr[i] == ':') {
+            notLit += tempstr[i];
+            i++;
+            if (tempstr[i] == '=') {
+                notLit += tempstr[i];
+                i++;
+            }
+        }
+        else if (tempstr[i] == '+') {
+            notLit += tempstr[i];
+            i++;
+            if (tempstr[i] == '+') {
+                notLit += tempstr[i];
+                i++;
+            }
+        }
+        else if (tempstr[i] == '-') {
+            notLit += tempstr[i];
+            i++;
+            if (tempstr[i] == '-') {
+                notLit += tempstr[i];
+                i++;
+            }
+        }
+        else if (tempstr[i] == '*') {
+            notLit += tempstr[i];
+            i++;
+            if (tempstr[i] == '*') {
+                notLit += tempstr[i];
+                i++;
+            }
+        }
+        else if (tempstr[i] == '/') {
+            notLit += tempstr[i];
+            i++;
+            if (tempstr[i] == '/') {
+                notLit += tempstr[i];
+                i++;
+            }
+        }
+        else if (tempstr[i] == '(' || tempstr[i] == ')' || tempstr[i] == ';') {
+            notLit += tempstr[i];
+            i++;
+        }
+        next_token = checkToken(notLit.c_str());
+        if (!notLit.empty() && next_token != NULL) {
+            lexeme[k][te] = notLit;
+            tokens[k][te] = next_token;
+            te++;
+        }
+        /*
+        if(checkToken(tok.c_str()) != EOF){
+
+>>>>>>> 6a9cd65a158fa2226a362cddb96e30fb9cc9cee8
         }
     }
 }
 //출력, ID, CONST, OP의 개수를 나타내주는 함수
+<<<<<<< HEAD
 void printResult(vector<vector<int>> tk, vector<vector<string>> lex) {
     for (int k = 0; k < tk.size(); k++) {
+=======
+void printResult(int** tk, string** lex) {
+    for (int k = 0; k < sizeof(tk) / sizeof(tk[0]); k++) {
+>>>>>>> 6a9cd65a158fa2226a362cddb96e30fb9cc9cee8
         int id_count = 0;
         int const_count = 0;
         int op_count = 0;
         string m;
         m.clear();
+<<<<<<< HEAD
         for (int i = 0; i < tk[k].size(); i++) {
             m += lex[k][i];
             if (i != tk[k].size() - 2) {
                 m += " ";
             }
+=======
+        for (int i = 0; i < sizeof(tk[k]) / sizeof(int); i++) {
+
+            m += lex[k][i];
+            m += " ";
+>>>>>>> 6a9cd65a158fa2226a362cddb96e30fb9cc9cee8
             if (tk[k][i] == IDENT) {
                 id_count++;
             }
@@ -296,6 +442,7 @@ void printResult(vector<vector<int>> tk, vector<vector<string>> lex) {
         }
         cout << m << endl;
         cout << "ID: " << id_count << "; CONST: " << const_count << "; OP: " << op_count << ";" << endl;
+<<<<<<< HEAD
         for (int s = 0; s < dup_op.size(); s++) {
             if (dup_op[s].front() == (char)k) {
                 cout << "(WARNING) \"중복 연산자(" << dup_op[s].back() << ") 제거 \" " << endl;
@@ -318,6 +465,8 @@ void printResult(vector<vector<int>> tk, vector<vector<string>> lex) {
         else {
             cout << "(OK)" << endl;
         }
+=======
+>>>>>>> 6a9cd65a158fa2226a362cddb96e30fb9cc9cee8
         //OK, WARNING, Error
     }
     //Result 
@@ -412,7 +561,11 @@ bool checkAddOp(const char c[]) {
 bool checkMulOp(const char c[]) {
     if ((int)strlen(c) == 2) {
         if ((c[0] == '*' && c[1] == '*') || (c[0] == '/' && c[1] == '/')) {
+<<<<<<< HEAD
             return true;
+=======
+
+>>>>>>> 6a9cd65a158fa2226a362cddb96e30fb9cc9cee8
         }
     }
     if ((int)strlen(c) != 1) {
@@ -470,12 +623,17 @@ int checkToken(const char t[]) {
     else if (checkLparen(t)) {
         return LPAREN;
     }
+<<<<<<< HEAD
     else if (checkRparen(t)) {  
+=======
+    else if (checkRparen(t)) {
+>>>>>>> 6a9cd65a158fa2226a362cddb96e30fb9cc9cee8
         return RPAREN;
     }
     else if (checkSemiColon(t)) {
         return SEMI_COLON;
     }
+<<<<<<< HEAD
     else return 0;
 }
 //Assignment 1 조건에 맞는 Recursive-Descent Parsing
@@ -488,11 +646,26 @@ void program(vector<vector<int>> tks) {
 //<statements> -> <statement> {<semi_colon><statements}
 void statements(vector<vector<int>> tks) {
     //cout << "Enter <statements>" << endl;
+=======
+    else return EOF;
+}
+//Assignment 1 조건에 맞는 Recursive-Descent Parsing
+//<program> -> <statements>
+void program(int** tks) {
+    cout << "Enter <program>" << endl;
+    statements(tks);
+    cout << "Exit <program>" << endl;
+}
+//<statements> -> <statement> {<semi_colon><statements}
+void statements(int** tks) {
+    cout << "Enter <statements>" << endl;
+>>>>>>> 6a9cd65a158fa2226a362cddb96e30fb9cc9cee8
     statement(tks);
     if (tokens[fl][f] == SEMI_COLON) {
         semi_colon(tks);
         statements(tks);
     }
+<<<<<<< HEAD
     //cout << "Exit <statements>" << endl;
 }
 //<statement> -> <ident> <assignment_op> <expression>
@@ -530,6 +703,45 @@ void term_tail(vector<vector<int>> tks) {
 //<factor> -> (<left_paren> <expression> <right_paren> | <ident> | <const>)
 void factor(vector<vector<int>> tks) {
     //cout << "Enter <factor>" << endl;
+=======
+    cout << "Exit <statements>" << endl;
+}
+//<statement> -> <ident> <assignment_op> <expression>
+void statement(int** tks) {
+    cout << "Enter <statement>" << endl;
+    ident(tks);
+    assignment_op(tks);
+    expression(tks);
+    cout << "Exit <statement>" << endl;
+}
+//<expression> -> <term> <term_tail>
+void expression(int** tks) {
+    cout << "Enter <expression>" << endl;
+    term(tks);
+    term_tail(tks);
+    cout << "Exit <expression>" << endl;
+}
+//<term> -> <factor> <factor_tail>
+void term(int** tks) {
+    cout << "Enter <term>" << endl;
+    factor(tks);
+    factor_tail(tks);
+    cout << "Exit <term>" << endl;
+}
+//<term_tail> -> {<add_op> <term> <term_tail>}
+void term_tail(int** tks) {
+    if (tks[fl][f] == ADD_OP) {
+        cout << "Enter <term_tail>" << endl;
+        add_op(tks);
+        term(tks);
+        term_tail(tks);
+        cout << "Exit <term_tail>" << endl;
+    }
+}
+//<factor> -> (<left_paren> <expression> <right_paren> | <ident> | <const>)
+void factor(int** tks) {
+    cout << "Enter <factor>" << endl;
+>>>>>>> 6a9cd65a158fa2226a362cddb96e30fb9cc9cee8
     if (tks[fl][f] == LPAREN) {
         left_paren(tks);
         expression(tks);
@@ -541,6 +753,7 @@ void factor(vector<vector<int>> tks) {
     else if (tks[fl][f] == CONST) {
         const_(tks);
     }
+<<<<<<< HEAD
     //cout << "Exit <factor>" << endl;
 }
 //<factor_tail> -> {<mult_op> <factor> <factor_tail>}
@@ -587,10 +800,59 @@ void semi_colon(vector<vector<int>> tks) {
     //cout << "Enter <semi_colon>" << endl;
     if (tks[fl][f] == SEMI_COLON) {
         if (tks[fl].size() == f + 1) { // 배열 길이, 
+=======
+    cout << "Exit <factor>" << endl;
+}
+//<factor_tail> -> {<mult_op> <factor> <factor_tail>}
+void factor_tail(int** tks) {
+    if (tks[fl][f] == MUL_OP) {
+        cout << "Enter <factor_tail>" << endl;
+        mult_op(tks);
+        factor(tks);
+        factor_tail(tks);
+        cout << "Exit <factor_tail>" << endl;
+    }
+}
+//<const> -> any decimal numbers
+void const_(int** tks) {
+    cout << "Enter <const>" << endl;
+    if (tks[fl][f] == CONST) {
+        if (!(tks[fl][f] == NULL)) { // 맨 끝은 identifier 아니면 const로 끝난다.
+            f++;
+        }
+    }
+    cout << "Exit <const>" << endl;
+}
+//<ident> -> any names conforming to C id rules
+void ident(int** tks) {
+    cout << "Enter <ident>" << endl;
+    if (tks[fl][f] == IDENT) {
+        if (!(tks[fl][f] == NULL)) {
+            f++;
+        }
+    }
+    cout << "Exit <ident>" << endl;
+}
+//<assignment_op> -> :=
+void assignment_op(int** tks) {
+    cout << "Enter <assignment_op>" << endl;
+    if (tks[fl][f] == ASSIGN_OP) {
+        f++;
+    }
+    cout << "Exit <assignmnet_op>" << endl;
+}
+//<semi_colon> -> ;
+//여기서 줄이 바뀐다, 2차원 배열이 바뀌는 것,
+void semi_colon(int** tks) {
+    cout << "Enter <semi_colon>" << endl;
+    if (tks[fl][f] == SEMI_COLON) {
+        if (sizeof(tks[fl]) / sizeof(int) == f + 1) { // 배열 길이, 
+>>>>>>> 6a9cd65a158fa2226a362cddb96e30fb9cc9cee8
             fl++;
             f = 0;
         }
     }
+<<<<<<< HEAD
     //cout << "Exit <semi_colon>" << endl;
 }
 //<add_op> -> (+|-)
@@ -621,10 +883,45 @@ void mult_op(vector<vector<int>> tks) {
     else if (lexeme[fl][f] == "//") {
         lexeme[fl][f] = "/";
         dup_op.push_back(char(fl) + lexeme[fl][f]);
+=======
+    cout << "Exit <semi_colon>" << endl;
+}
+//<add_op> -> (+|-)
+void add_op(int** tks) {
+    cout << "Enter <add_op>" << endl;
+    if (lexeme[fl][f] == "++") {
+        lexeme[fl][f] = "+";
+        dup_op[s] = to_string(fl) + "+";
+        s++;
+    }
+    else if (lexeme[fl][f] == "--") {
+        lexeme[fl][f] = "-";
+        dup_op[s] = to_string(fl) + "-";
+        s++;
+    }
+    if (tks[fl][f] == ADD_OP) {
+        f++;
+    }
+    cout << "Exit <add_op>" << endl;
+}
+//<mult_op> -> (*|/)
+void mult_op(int** tks) {
+    cout << "Enter <mult_op>" << endl;
+    if (lexeme[fl][f] == "**") {
+        lexeme[fl][f] = "*";
+        dup_op[s] = to_string(fl) + "*";
+        s++;
+    }
+    else if (lexeme[fl][f] == "//") {
+        lexeme[fl][f] = "/";
+        dup_op[s] = to_string(fl) + "/"; //몇 번줄에서 일어났는지,
+        s++;
+>>>>>>> 6a9cd65a158fa2226a362cddb96e30fb9cc9cee8
     }
     if (tks[fl][f] == MUL_OP) {
         f++;
     }
+<<<<<<< HEAD
     //cout << "Exit <mult_op>" << endl;
 }
 //<left_paren> -> (
@@ -643,3 +940,23 @@ void right_paren(vector<vector<int>> tks) {
     }
     //cout << "Exit <right_paren>" << endl;
 }
+=======
+    cout << "Exit <mult_op>" << endl;
+}
+//<left_paren> -> (
+void left_paren(int** tks) {
+    cout << "Enter <left_paren>" << endl;
+    if (tks[fl][f] == LPAREN) {
+        f++;
+    }
+    cout << "Exit <left_paren>" << endl;
+}
+//<right_paren> -> )
+void right_paren(int** tks) {
+    cout << "Enter <right_paren>" << endl;
+    if (tks[fl][f] == RPAREN) {
+        f++;
+    }
+    cout << "Exit <right_paren>" << endl;
+}
+>>>>>>> 6a9cd65a158fa2226a362cddb96e30fb9cc9cee8
