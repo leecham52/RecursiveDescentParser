@@ -10,7 +10,6 @@
 #include <string.h>
 using namespace std;
 
-//아쉽지만, 전역변수로 받기
 vector<vector<int>> tokens;
 vector<vector<string>> lexeme;
 int fl = 0;
@@ -608,6 +607,8 @@ void add_op(vector<vector<int>> tks) {
     if (tks[fl][f] == ADD_OP) {
         f++;
     }
+
+
     //cout << "Exit <add_op>" << endl;
 }
 //<mult_op> -> (*|/)
