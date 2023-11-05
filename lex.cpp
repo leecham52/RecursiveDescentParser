@@ -16,7 +16,7 @@ vector<vector<string>> lexeme;
 int fl = 0;
 int f = 0;
 vector<string> dup_op;
-string error;
+vector<string> error;
 struct id {
     string id;
     int val;
@@ -199,12 +199,18 @@ void calString() {
     num.push(result);
 }
 void calIdent(vector<vector<int>> tk, vector<vector<string>> lex, vector<id>& ident) {
+    vector<string> e = error;
     //ident 계산
     for (int k = 0; k < tk.size(); k++) {
         for (int i = 2; i < tk[k].size(); i++) {
             if (tk[k][i] == IDENT) {
-                for (int j = 0; j < ident.size(); j++) {
-                    int l = 0;
+                if (ident.size() == 0) {
+                    num.push(UNKNOWN);
+                    ident.push_back({ lex[k][i], UNKNOWN });
+                    error.push_back(to_string(k) + lex[k][i]);
+                }
+                for (int j = 1; j < ident.size(); j++) {
+                    int l = 1;
                     if (lex[k][i] == ident[j].id) {
                         num.push(ident[j].val);
                     }
@@ -213,7 +219,20 @@ void calIdent(vector<vector<int>> tk, vector<vector<string>> lex, vector<id>& id
                         if (l == ident.size()) {
                             num.push(UNKNOWN);
                             ident.push_back({lex[k][i], UNKNOWN});
-                            error = to_string(k) + lex[k][i];
+                            for (int c = 0; c < error.size(); c++) {
+                                string getE = error[c];
+                                for (int b = 1; b < getE.size(); b++) {
+                                    error[c].erase(0);
+                                    error[c] += getE[b];
+                                }
+                                cout<< error[c].front();
+                                if (lex[k][i] != error[c]) {
+                                    error.push_back(to_string(k) + lex[k][i]);
+                                    error[c] = getE;
+                                    break;
+                                }
+                                error[c] = getE;
+                            }
                         }
                     }
                 }
@@ -283,17 +302,29 @@ void printResult(vector<vector<int>> tk, vector<vector<string>> lex) {
                 cout << "(WARNING) \"중복 연산자(" << dup_op[s].back() << ") 제거 \" " << endl;
             }
         }
-        if (!error.empty()  && error.front() == char(k)) {
-            error.erase(0);
-            cout << "(Error) \"정의되지 않은 변수("<< error << ")가 참조됨\"" << endl;
+        if (!error.empty()) {
+            for (int v = 0; v < error.size(); v++) {
+                string errP;
+                errP = error[v].front();
+                if (errP[0] - '0' == char(k)) {
+                    errP.clear();
+                    for (int b = 1; b < error[v].size(); b++) {
+                        errP += error[v][b];
+                    }
+                    cout << "(Error) \"정의되지 않은 변수(" << errP << ")가 참조됨\"" << endl;
+                    break;
+                }
+            }
         }
-        cout << "(OK)" << endl;
+        else {
+            cout << "(OK)" << endl;
+        }
         //OK, WARNING, Error
     }
     //Result 
     cout << "Result ==> ";
     for (int n = 0; n < ide.size(); n++) {
-        if (ide[n].val < 0) {
+        if (ide[n].val < 0 || ide[n].val > 10000) {
             if (n == ide.size() - 1) {
                 cout << ide[n].id << ": Unknown";
             }
@@ -370,7 +401,7 @@ bool checkAddOp(const char c[]) {
             return true;
         }
     }
-    if ((int)strlen(c) != 1 || (int)strlen(c) != 2) {
+    if ((int)strlen(c) != 1) {
         return false;
     }
     if (c[0] == '+' || c[0] == '-') {
@@ -385,7 +416,7 @@ bool checkMulOp(const char c[]) {
             return true;
         }
     }
-    if ((int)strlen(c) != 1 || (int)strlen(c) != 2) {
+    if ((int)strlen(c) != 1) {
         return false;
     }
     if (c[0] == '*' || c[0] == '/') {
