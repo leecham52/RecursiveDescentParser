@@ -492,15 +492,24 @@ void program(vector<vector<int>> tks) {
 void statements(vector<vector<int>> tks) {
     cout << "Enter <statements>" << endl;
     statement(tks);
-    if (tokens[fl][f] == SEMI_COLON) {
-        semi_colon(tks);
-        statements(tks);
+    if (tks[fl].size() != f) {
+        if (tokens[fl][f] == SEMI_COLON) {
+            semi_colon(tks);
+            statements(tks);
+        }
+        else {
+            cout << "조건에 맞지 않는 토큰:" << tks[fl][f] << lexeme[fl][f] << "입력" << endl;
+            exit(100);
+        }
+        cout << "Exit <statements>" << endl;
     }
     else {
-        cout <<"조건에 맞지 않는 토큰:"<< tks[fl][f] << lexeme[fl][f] << "입력" << endl;
-        exit(100);
+        if (tks.size() != fl) {
+            fl++;
+            cout << "조건에 맞지 않는 lexeme:" << lexeme[fl][0] << "입력" << endl;
+            exit(100);
+        }
     }
-    cout << "Exit <statements>" << endl;
 }
 //<statement> -> <ident> <assignment_op> <expression>
 void statement(vector<vector<int>> tks) {
@@ -526,169 +535,279 @@ void term(vector<vector<int>> tks) {
 }
 //<term_tail> -> {<add_op> <term> <term_tail>}
 void term_tail(vector<vector<int>> tks) {
-    if (tks[fl][f] == ADD_OP) {
-        cout << "Enter <term_tail>" << endl;
-        add_op(tks);
-        term(tks);
-        term_tail(tks);
-        cout << "Exit <term_tail>" << endl;
+    if (tks[fl].size() != f) {
+        if (tks[fl][f] == ADD_OP) {
+            cout << "Enter <term_tail>" << endl;
+            add_op(tks);
+            term(tks);
+            term_tail(tks);
+            cout << "Exit <term_tail>" << endl;
+        }
+        else {
+            cout << "조건에 맞지 않는 lexeme:" << lexeme[fl][f] << "입력" << endl;
+            exit(100);
+            return;
+        }
     }
     else {
-        cout << "조건에 맞지 않는 토큰:" << tks[fl][f] << lexeme[fl][f] << "입력" << endl;
-        exit(100);
+        if (tks.size() != fl) {
+            cout << "조건에 맞지 않는 lexeme:" << lexeme[fl][0] << "입력" << endl;
+            exit(100);
+        }
     }
 }
 //<factor> -> (<left_paren> <expression> <right_paren> | <ident> | <const>)
 void factor(vector<vector<int>> tks) {
-    cout << "Enter <factor>" << endl;
-    if (tks[fl][f] == LPAREN) {
-        left_paren(tks);
-        expression(tks);
-        right_paren(tks);
-    }
-    else if (tks[fl][f] == IDENT) {
-        ident(tks);
-    }
-    else if (tks[fl][f] == CONST) {
-        const_(tks);
+    if (tks[fl].size() != f) {
+        cout << "Enter <factor>" << endl;
+        if (tks[fl][f] == LPAREN) {
+            left_paren(tks);
+            expression(tks);
+            right_paren(tks);
+        }
+        else if (tks[fl][f] == IDENT) {
+            ident(tks);
+        }
+        else if (tks[fl][f] == CONST) {
+            const_(tks);
+        }
+        else {
+            cout << "조건에 맞지 않는 lexeme:" << lexeme[fl][f] << "입력" << endl;
+            exit(100);
+            return;
+        }
+        cout << "Exit <factor>" << endl;
     }
     else {
-        cout << "조건에 맞지 않는 토큰:" << tks[fl][f] << lexeme[fl][f] << "입력" << endl;
-        exit(100);
+        if (tks.size() != fl) {
+            fl++;
+            cout << "조건에 맞지 않는 lexeme:" << lexeme[fl][0] << "입력" << endl;
+            exit(100);
+        }
     }
-    cout << "Exit <factor>" << endl;
 }
 //<factor_tail> -> {<mult_op> <factor> <factor_tail>}
 void factor_tail(vector<vector<int>> tks) {
-    if (tks[fl][f] == MUL_OP) {
-        cout << "Enter <factor_tail>" << endl;
-        mult_op(tks);
-        factor(tks);
-        factor_tail(tks);
-        cout << "Exit <factor_tail>" << endl;
+    if (tks[fl].size() != f) {
+        if (tks[fl][f] == MUL_OP) {
+            cout << "Enter <factor_tail>" << endl;
+            mult_op(tks);
+            factor(tks);
+            factor_tail(tks);
+            cout << "Exit <factor_tail>" << endl;
+        }
+        else {
+            cout << "조건에 맞지 않는 lexeme:" << lexeme[fl][f] << "입력" << endl;
+            exit(100);
+            return;
+        }
     }
     else {
-        cout << "조건에 맞지 않는 토큰:" << tks[fl][f] << lexeme[fl][f] << "입력" << endl;
-        exit(100);
+        if (tks.size() != fl) {
+            fl++;
+            cout << "조건에 맞지 않는 lexeme:" << lexeme[fl][0] << "입력" << endl;
+            exit(100);
+        }
     }
 }
 //<const> -> any decimal numbers
 void const_(vector<vector<int>> tks) {
-    cout << "Enter <const>" << endl;
-    if (tks[fl][f] == CONST) {
-        if (fl != tks.size() - 1 || f != tks[fl].size() - 1) {
-            f++;
+    if (tks[fl].size() != f) {
+        cout << "Enter <const>" << endl;
+        if (tks[fl][f] == CONST) {
+            if (fl != tks.size() - 1 || f != tks[fl].size() - 1) {
+                f++;
+            }
         }
+        else {
+            cout << "조건에 맞지 않는 lexeme:" << lexeme[fl][f] << "입력" << endl;
+            exit(100);
+            return;
+        }
+        cout << "Exit <const>" << endl;
     }
     else {
-        cout << "조건에 맞지 않는 토큰:" << tks[fl][f] << lexeme[fl][f] << "입력" << endl;
-        exit(100);
+        if (tks.size() != fl) {
+            fl++;
+            cout << "조건에 맞지 않는 lexeme:" << lexeme[fl][0] << "입력" << endl;
+            exit(100);
+        }
     }
-    cout << "Exit <const>" << endl;
+
 }
 //<ident> -> any names conforming to C id rules
 void ident(vector<vector<int>> tks) {
-    cout << "Enter <ident>" << endl;
-    if (tks[fl][f] == IDENT) {
-        if (fl != tks.size() - 1 || f != tks[fl].size() - 1) {
-            f++;
+    if (tks[fl].size() != f) {
+        cout << "Enter <ident>" << endl;
+        if (tks[fl][f] == IDENT) {
+            if (fl != tks.size() - 1 || f != tks[fl].size() - 1) {
+                f++;
+            }
         }
+        else {
+            cout << "조건에 맞지 않는 lexeme:" << lexeme[fl][f] << "입력" << endl;
+            exit(100);
+            return;
+        }
+        cout << "Exit <ident>" << endl;
     }
     else {
-        cout << "조건에 맞지 않는 토큰:" << tks[fl][f] << lexeme[fl][f] << "입력" << endl;
-        exit(100);
+        if (tks.size() != fl) {
+            fl++;
+            cout << "조건에 맞지 않는 lexeme:" << lexeme[fl][0] << "입력" << endl;
+            exit(100);
+        }
     }
-    cout << "Exit <ident>" << endl;
 }
 //<assignment_op> -> :=
 void assignment_op(vector<vector<int>> tks) {
-    cout << "Enter <assignment_op>" << endl;
-    if (tks[fl][f] == ASSIGN_OP) {
-        f++;
+    if (tks[fl].size() != f) {
+        cout << "Enter <assignment_op>" << endl;
+        if (tks[fl][f] == ASSIGN_OP) {
+            f++;
+        }
+        else {
+            cout << "조건에 맞지 않는 lexeme:" << lexeme[fl][f] << "입력" << endl;
+            exit(100);
+            return;
+        }
+        cout << "Exit <assignmnet_op>" << endl;
     }
     else {
-        cout << "조건에 맞지 않는 토큰:" << tks[fl][f] << lexeme[fl][f] << "입력" << endl;
-        exit(100);
+        if (tks.size() != fl) {
+            fl++;
+            cout << "조건에 맞지 않는 lexeme:" << lexeme[fl][0] << "입력" << endl;
+            exit(100);
+        }
     }
-    cout << "Exit <assignmnet_op>" << endl;
 }
 //<semi_colon> -> ;
 //여기서 줄이 바뀐다, 2차원 배열이 바뀌는 것,
 void semi_colon(vector<vector<int>> tks) {
-    cout << "Enter <semi_colon>" << endl;
-    if (tks[fl][f] == SEMI_COLON) {
-        if (tks[fl].size() == f + 1) { // 배열 길이, 
-            fl++;
-            f = 0;
+    if (tks[fl].size() != f) {
+        cout << "Enter <semi_colon>" << endl;
+        if (tks[fl][f] == SEMI_COLON) {
+            if (tks[fl].size() == f + 1) { // 배열 길이, 
+                fl++;
+                f = 0;
+            }
         }
+        else {
+            cout << "조건에 맞지 않는 lexeme:" << lexeme[fl][f] << "입력" << endl;
+            exit(100);
+            return;
+        }
+        cout << "Exit <semi_colon>" << endl;
     }
     else {
-        cout << "조건에 맞지 않는 토큰:" << tks[fl][f] << lexeme[fl][f] << "입력" << endl;
-        exit(100);
+        if (tks.size() != fl) {
+            fl++;
+            cout << "조건에 맞지 않는 lexeme:" << lexeme[fl][0] << "입력" << endl;
+            exit(100);
+        }
     }
-    cout << "Exit <semi_colon>" << endl;
 }
 //<add_op> -> (+|-)
 void add_op(vector<vector<int>> tks) {
-    cout << "Enter <add_op>" << endl;
-    if (lexeme[fl][f] == "++") {
-        lexeme[fl][f] = "+";
-        dup_op.push_back(char(fl) + lexeme[fl][f]);
-    }
-    else if (lexeme[fl][f] == "--") {
-        lexeme[fl][f] = "-";
-        dup_op.push_back(char(fl) + lexeme[fl][f]);
-    }
-    if (tks[fl][f] == ADD_OP) {
-        f++;
+    if (tks[fl].size() != f) {
+        cout << "Enter <add_op>" << endl;
+        if (lexeme[fl][f] == "++") {
+            lexeme[fl][f] = "+";
+            dup_op.push_back(char(fl) + lexeme[fl][f]);
+        }
+        else if (lexeme[fl][f] == "--") {
+            lexeme[fl][f] = "-";
+            dup_op.push_back(char(fl) + lexeme[fl][f]);
+        }
+        if (tks[fl][f] == ADD_OP) {
+            f++;
+        }
+        else {
+            cout << "조건에 맞지 않는 lexeme:" << lexeme[fl][f] << "입력" << endl;
+            exit(100);
+            return;
+        }
+        cout << "Exit <add_op>" << endl;
     }
     else {
-        cout << "조건에 맞지 않는 토큰:" << tks[fl][f] << lexeme[fl][f] << "입력" << endl;
-        exit(100);
+        if (tks.size() != fl) {
+            fl++;
+            cout << "조건에 맞지 않는 lexeme:" << lexeme[fl][0] << "입력" << endl;
+            exit(100);
+        }
     }
-    cout << "Exit <add_op>" << endl;
 }
 //<mult_op> -> (*|/)
 void mult_op(vector<vector<int>> tks) {
-    cout << "Enter <mult_op>" << endl;
-    if (lexeme[fl][f] == "**") {
-        lexeme[fl][f] = "*";
-        dup_op.push_back(char(fl) + lexeme[fl][f]);
-    }
-    else if (lexeme[fl][f] == "//") {
-        lexeme[fl][f] = "/";
-        dup_op.push_back(char(fl) + lexeme[fl][f]);
-    }
-    if (tks[fl][f] == MUL_OP) {
-        f++;
+    if (tks[fl].size() != f) {
+        cout << "Enter <mult_op>" << endl;
+        if (lexeme[fl][f] == "**") {
+            lexeme[fl][f] = "*";
+            dup_op.push_back(char(fl) + lexeme[fl][f]);
+        }
+        else if (lexeme[fl][f] == "//") {
+            lexeme[fl][f] = "/";
+            dup_op.push_back(char(fl) + lexeme[fl][f]);
+        }
+        if (tks[fl][f] == MUL_OP) {
+            f++;
+        }
+        else {
+            cout << "조건에 맞지 않는 lexeme:" << lexeme[fl][f] << "입력" << endl;
+            exit(100);
+            return;
+        }
+        cout << "Exit <mult_op>" << endl;
     }
     else {
-        cout << "조건에 맞지 않는 토큰:" << tks[fl][f] << lexeme[fl][f] << "입력" << endl;
-        exit(100);
+        if (tks.size() != fl) {
+            fl++;
+            cout << "조건에 맞지 않는 lexeme:" << lexeme[fl][0] << "입력" << endl;
+            exit(100);
+        }
     }
-    cout << "Exit <mult_op>" << endl;
 }
 //<left_paren> -> (
 void left_paren(vector<vector<int>> tks) {
-    cout << "Enter <left_paren>" << endl;
-    if (tks[fl][f] == LPAREN) {
-        f++;
+    if (tks[fl].size() != f) {
+        cout << "Enter <left_paren>" << endl;
+        if (tks[fl][f] == LPAREN) {
+            f++;
+        }
+        else {
+            cout << "조건에 맞지 않는 lexeme:" << lexeme[fl][f] << "입력" << endl;
+            exit(100);
+            return;
+        }
+        cout << "Exit <left_paren>" << endl;
     }
     else {
-        cout << "조건에 맞지 않는 토큰:" << tks[fl][f] << lexeme[fl][f] << "입력" << endl;
-        exit(100);
+        if (tks.size() != fl) {
+            fl++;
+            cout << "조건에 맞지 않는 lexeme:" << lexeme[fl][0] << "입력" << endl;
+            exit(100);
+        }
     }
-    cout << "Exit <left_paren>" << endl;
 }
 //<right_paren> -> )
 void right_paren(vector<vector<int>> tks) {
-    cout << "Enter <right_paren>" << endl;
-    if (tks[fl][f] == RPAREN) {
-        f++;
-        cout << "Exit <right_paren>" << endl;
+    if (tks[fl].size() != f) {
+        cout << "Enter <right_paren>" << endl;
+        if (tks[fl][f] == RPAREN) {
+            f++;
+            cout << "Exit <right_paren>" << endl;
+        }
+        else {
+            cout << "조건에 맞지 않는 lexeme:" << lexeme[fl][f] << "입력" << endl;
+            exit(100);
+            return;
+        }
     }
     else {
-        cout << "조건에 맞지 않는 토큰:" << tks[fl][f] << lexeme[fl][f] << "입력" << endl;
-        exit(100);
+        if (tks.size() != fl) {
+            fl++;
+            cout << "조건에 맞지 않는 lexeme:" << lexeme[fl][0] << "입력" << endl;
+            exit(100);
+        }
     }
 }
