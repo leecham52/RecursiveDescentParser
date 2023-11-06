@@ -328,13 +328,15 @@ void printResult(vector<vector<int>> tk, vector<vector<string>> lex) {
             if (n == ide.size() - 1) {
                 cout << ide[n].id << ": Unknown";
             }
-            cout << ide[n].id << ": " << "Unknown;";
+            else
+                cout << ide[n].id << ": " << "Unknown;";
         }
         else {
             if (n == ide.size() - 1) {
                 cout << ide[n].id << ": " << to_string(ide[n].val);
             }
-            cout << ide[n].id << ": " << to_string(ide[n].val) << ";";
+            else
+                cout << ide[n].id << ": " << to_string(ide[n].val) << ";";
         }
     }
     
