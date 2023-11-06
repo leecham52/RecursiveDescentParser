@@ -22,7 +22,7 @@ struct id {
     int val;
 };
 struct op {
-    string op;
+    string ope;
     int p;
 };
 vector<id> ide;
@@ -186,7 +186,7 @@ void calString() {
     num.pop();
     a = num.top();
     num.pop();
-    string operate = oper.top().op;
+    string operate = oper.top().ope;
     oper.pop();
     if (operate == "*")
         result = a * b;
@@ -257,7 +257,7 @@ void calIdent(vector<vector<int>> tk, vector<vector<string>> lex, vector<id>& id
                 oper.push({lex[k][i], 0});
             }
             else if (tk[k][i] == RPAREN) {
-                while (oper.top().op != "(") {
+                while (oper.top().ope != "(") {
                     calString();
                 }
                 oper.pop();
