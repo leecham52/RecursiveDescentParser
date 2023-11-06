@@ -76,11 +76,11 @@ void printResult(vector<vector<int>> tk, vector<vector<string>> lex);
 
 
 int main(int argc, char* argv[]) {
-    
+
     string in;
 
     //c++에 맞춰서 변환, string으로 낑겨 받으면 좋을수도 아닐수도
-    ifstream in_Fp("input1.txt");
+    ifstream in_Fp("input.txt");
     if (!in_Fp.is_open()) {
         cout << "ERROR - cannot open front.in" << endl;
         return 0;
@@ -218,14 +218,14 @@ void calIdent(vector<vector<int>> tk, vector<vector<string>> lex, vector<Id>& id
                         l++;
                         if (l == ident.size()) {
                             num.push(UNKNOWN);
-                            ident.push_back({lex[k][i], UNKNOWN});
+                            ident.push_back({ lex[k][i], UNKNOWN });
                             for (int c = 0; c < error.size(); c++) {
                                 string getE = error[c];
                                 for (int b = 1; b < getE.size(); b++) {
                                     error[c].erase(0);
                                     error[c] += getE[b];
                                 }
-                                cout<< error[c].front();
+                                cout << error[c].front();
                                 if (lex[k][i] != error[c]) {
                                     error.push_back(to_string(k) + lex[k][i]);
                                     error[c] = getE;
@@ -254,7 +254,7 @@ void calIdent(vector<vector<int>> tk, vector<vector<string>> lex, vector<Id>& id
                 oper.push({ lex[k][i], pr });
             }
             else if (tk[k][i] == LPAREN) {
-                oper.push({lex[k][i], 0});
+                oper.push({ lex[k][i], 0 });
             }
             else if (tk[k][i] == RPAREN) {
                 while (oper.top().ope != "(") {
@@ -339,7 +339,7 @@ void printResult(vector<vector<int>> tk, vector<vector<string>> lex) {
                 cout << ide[n].id << ": " << to_string(ide[n].val) << ";";
         }
     }
-    
+
 }
 //ascii code 32이하인지 확인
 bool checkWhiteSpace(char c) {
@@ -473,7 +473,7 @@ int checkToken(const char t[]) {
     else if (checkLparen(t)) {
         return LPAREN;
     }
-    else if (checkRparen(t)) {  
+    else if (checkRparen(t)) {
         return RPAREN;
     }
     else if (checkSemiColon(t)) {
@@ -576,7 +576,7 @@ void factor_tail(vector<vector<int>> tks) {
 void const_(vector<vector<int>> tks) {
     cout << "Enter <const>" << endl;
     if (tks[fl][f] == CONST) {
-        if (fl != tks.size()-1 || f != tks[fl].size() - 1) {
+        if (fl != tks.size() - 1 || f != tks[fl].size() - 1) {
             f++;
         }
     }
@@ -590,7 +590,7 @@ void const_(vector<vector<int>> tks) {
 void ident(vector<vector<int>> tks) {
     cout << "Enter <ident>" << endl;
     if (tks[fl][f] == IDENT) {
-        if (fl != tks.size() - 1 || f != tks[fl].size()-1) {
+        if (fl != tks.size() - 1 || f != tks[fl].size() - 1) {
             f++;
         }
     }
