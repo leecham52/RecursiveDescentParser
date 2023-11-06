@@ -497,10 +497,6 @@ void statements(vector<vector<int>> tks) {
             semi_colon(tks);
             statements(tks);
         }
-        else {
-            cout << "조건에 맞지 않는 토큰:" << tks[fl][f] << lexeme[fl][f] << "입력" << endl;
-            exit(100);
-        }
         cout << "Exit <statements>" << endl;
     }
     else {
@@ -543,11 +539,6 @@ void term_tail(vector<vector<int>> tks) {
             term_tail(tks);
             cout << "Exit <term_tail>" << endl;
         }
-        else {
-            cout << "조건에 맞지 않는 lexeme:" << lexeme[fl][f] << "입력" << endl;
-            exit(100);
-            return;
-        }
     }
     else {
         if (tks.size() != fl) {
@@ -588,18 +579,13 @@ void factor(vector<vector<int>> tks) {
 }
 //<factor_tail> -> {<mult_op> <factor> <factor_tail>}
 void factor_tail(vector<vector<int>> tks) {
+    cout << "Enter <factor_tail>" << endl;
     if (tks[fl].size() != f) {
         if (tks[fl][f] == MUL_OP) {
-            cout << "Enter <factor_tail>" << endl;
             mult_op(tks);
             factor(tks);
             factor_tail(tks);
             cout << "Exit <factor_tail>" << endl;
-        }
-        else {
-            cout << "조건에 맞지 않는 lexeme:" << lexeme[fl][f] << "입력" << endl;
-            exit(100);
-            return;
         }
     }
     else {
@@ -618,11 +604,6 @@ void const_(vector<vector<int>> tks) {
             if (fl != tks.size() - 1 || f != tks[fl].size() - 1) {
                 f++;
             }
-        }
-        else {
-            cout << "조건에 맞지 않는 lexeme:" << lexeme[fl][f] << "입력" << endl;
-            exit(100);
-            return;
         }
         cout << "Exit <const>" << endl;
     }
@@ -644,11 +625,6 @@ void ident(vector<vector<int>> tks) {
                 f++;
             }
         }
-        else {
-            cout << "조건에 맞지 않는 lexeme:" << lexeme[fl][f] << "입력" << endl;
-            exit(100);
-            return;
-        }
         cout << "Exit <ident>" << endl;
     }
     else {
@@ -665,11 +641,6 @@ void assignment_op(vector<vector<int>> tks) {
         cout << "Enter <assignment_op>" << endl;
         if (tks[fl][f] == ASSIGN_OP) {
             f++;
-        }
-        else {
-            cout << "조건에 맞지 않는 lexeme:" << lexeme[fl][f] << "입력" << endl;
-            exit(100);
-            return;
         }
         cout << "Exit <assignmnet_op>" << endl;
     }
@@ -691,11 +662,6 @@ void semi_colon(vector<vector<int>> tks) {
                 fl++;
                 f = 0;
             }
-        }
-        else {
-            cout << "조건에 맞지 않는 lexeme:" << lexeme[fl][f] << "입력" << endl;
-            exit(100);
-            return;
         }
         cout << "Exit <semi_colon>" << endl;
     }
@@ -722,11 +688,6 @@ void add_op(vector<vector<int>> tks) {
         if (tks[fl][f] == ADD_OP) {
             f++;
         }
-        else {
-            cout << "조건에 맞지 않는 lexeme:" << lexeme[fl][f] << "입력" << endl;
-            exit(100);
-            return;
-        }
         cout << "Exit <add_op>" << endl;
     }
     else {
@@ -752,11 +713,6 @@ void mult_op(vector<vector<int>> tks) {
         if (tks[fl][f] == MUL_OP) {
             f++;
         }
-        else {
-            cout << "조건에 맞지 않는 lexeme:" << lexeme[fl][f] << "입력" << endl;
-            exit(100);
-            return;
-        }
         cout << "Exit <mult_op>" << endl;
     }
     else {
@@ -773,11 +729,6 @@ void left_paren(vector<vector<int>> tks) {
         cout << "Enter <left_paren>" << endl;
         if (tks[fl][f] == LPAREN) {
             f++;
-        }
-        else {
-            cout << "조건에 맞지 않는 lexeme:" << lexeme[fl][f] << "입력" << endl;
-            exit(100);
-            return;
         }
         cout << "Exit <left_paren>" << endl;
     }
@@ -796,11 +747,6 @@ void right_paren(vector<vector<int>> tks) {
         if (tks[fl][f] == RPAREN) {
             f++;
             cout << "Exit <right_paren>" << endl;
-        }
-        else {
-            cout << "조건에 맞지 않는 lexeme:" << lexeme[fl][f] << "입력" << endl;
-            exit(100);
-            return;
         }
     }
     else {
