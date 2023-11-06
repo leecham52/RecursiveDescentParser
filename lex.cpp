@@ -210,7 +210,7 @@ void calIdent(vector<vector<int>> tk, vector<vector<string>> lex, vector<id>& id
                     error.push_back(to_string(k) + lex[k][i]);
                 }
                 for (int j = 0; j < ident.size(); j++) {
-                    int l = 1;
+                    int l = 0;
                     if (lex[k][i] == ident[j].id) {
                         num.push(ident[j].val);
                     }
