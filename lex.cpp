@@ -288,6 +288,7 @@ void calIdent(vector<vector<int>> tk, vector<vector<string>> lex, vector<Id>& id
         }
         if (tk[k][0] == IDENT) {
             int ni = 0;
+            //이미 있는 ident에 대해서 새로 정의될 때,
             for(int u = 0; u < ident.size(); u++){
                 if(ident[u].id == lex[k][0]){
                     ident[u].val = num.top();
@@ -312,9 +313,10 @@ void printResult(vector<vector<int>> tk, vector<vector<string>> lex) {
         m.clear();
         for (int i = 0; i < tk[k].size(); i++) {
             m += lex[k][i];
-            if (i != tk[k].size() - 2) {
+            if (i != tk[k].size() - 1) {
                 m += " ";
             }
+            //id, const, op의 개수 확인
             if (tk[k][i] == IDENT) {
                 id_count++;
             }
@@ -327,11 +329,15 @@ void printResult(vector<vector<int>> tk, vector<vector<string>> lex) {
         }
         cout << m << endl;
         cout << "ID: " << id_count << "; CONST: " << const_count << "; OP: " << op_count << ";" << endl;
+        //중복 연산자가 있었다면, dup_op vector 확인후 출력
+        int ew = 0;
         for (int s = 0; s < dup_op.size(); s++) {
             if (dup_op[s].front() == (char)k) {
+                ew = 1;
                 cout << "(WARNING) \"중복 연산자(" << dup_op[s].back() << ") 제거 \" " << endl;
             }
         }
+        //Unknown한 ident가 있다면 error
         if (!error.empty()) {
             for (int v = 0; v < error.size(); v++) {
                 string errP;
@@ -341,12 +347,14 @@ void printResult(vector<vector<int>> tk, vector<vector<string>> lex) {
                     for (int b = 1; b < error[v].size(); b++) {
                         errP += error[v][b];
                     }
+                    ew = 1;
                     cout << "(Error) \"정의되지 않은 변수(" << errP << ")가 참조됨\"" << endl;
                     break;
                 }
             }
         }
-        else {
+        //둘 다 아니면, ok 출력
+        if(ew == 0){
             cout << "(OK)" << endl;
         }
         //OK, WARNING, Error
@@ -424,18 +432,8 @@ bool checkConst(const char c[]) {
     }
     return false;
 }
-//+,-인지 확인 + ++, --에 대해서는? 따로 처리 레츠고
-//++, -- 한번씩만 더 쓴 걸로 생각 하고 +-, -+ 같은 경우는 false로 처리
-//
+//+,-인지 확인
 bool checkAddOp(const char c[]) {
-    if ((int)strlen(c) == 2) {
-        if ((c[0] == '+' && c[1] == '+') || (c[0] == '-' && c[1] == '-')) {
-            return true;
-        }
-    }
-    if ((int)strlen(c) != 1) {
-        return false;
-    }
     if (c[0] == '+' || c[0] == '-') {
         return true;
     }
@@ -443,14 +441,6 @@ bool checkAddOp(const char c[]) {
 }
 //*,/인지 확인
 bool checkMulOp(const char c[]) {
-    if ((int)strlen(c) == 2) {
-        if ((c[0] == '*' && c[1] == '*') || (c[0] == '/' && c[1] == '/')) {
-            return true;
-        }
-    }
-    if ((int)strlen(c) != 1) {
-        return false;
-    }
     if (c[0] == '*' || c[0] == '/') {
         return true;
     }
