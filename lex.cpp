@@ -17,7 +17,7 @@ int fl = 0;
 int f = 0;
 vector<string> dup_op;
 vector<string> error;
-struct id {
+struct Id {
     string id;
     int val;
 };
@@ -25,7 +25,7 @@ struct op {
     string ope;
     int p;
 };
-vector<id> ide;
+vector<Id> ide;
 stack<int> num;
 stack<op> oper;
 
@@ -71,7 +71,7 @@ void right_paren(vector<vector<int>> tks);
 
 void lexical(string str);
 void calString();
-void calIdent(vector<vector<int>> tk, vector<vector<string>> lex, vector<id>& ident);
+void calIdent(vector<vector<int>> tk, vector<vector<string>> lex, vector<Id>& ident);
 void printResult(vector<vector<int>> tk, vector<vector<string>> lex);
 
 
@@ -198,7 +198,7 @@ void calString() {
         result = a - b;
     num.push(result);
 }
-void calIdent(vector<vector<int>> tk, vector<vector<string>> lex, vector<id>& ident) {
+void calIdent(vector<vector<int>> tk, vector<vector<string>> lex, vector<Id>& ident) {
     vector<string> e = error;
     //ident 계산
     for (int k = 0; k < tk.size(); k++) {
@@ -496,6 +496,10 @@ void statements(vector<vector<int>> tks) {
         semi_colon(tks);
         statements(tks);
     }
+    else {
+        cout <<"조건에 맞지 않는 토큰:"<< tks[fl][f] << lexeme[fl][f] << "입력" << endl;
+        exit(100);
+    }
     cout << "Exit <statements>" << endl;
 }
 //<statement> -> <ident> <assignment_op> <expression>
@@ -529,6 +533,10 @@ void term_tail(vector<vector<int>> tks) {
         term_tail(tks);
         cout << "Exit <term_tail>" << endl;
     }
+    else {
+        cout << "조건에 맞지 않는 토큰:" << tks[fl][f] << lexeme[fl][f] << "입력" << endl;
+        exit(100);
+    }
 }
 //<factor> -> (<left_paren> <expression> <right_paren> | <ident> | <const>)
 void factor(vector<vector<int>> tks) {
@@ -544,6 +552,10 @@ void factor(vector<vector<int>> tks) {
     else if (tks[fl][f] == CONST) {
         const_(tks);
     }
+    else {
+        cout << "조건에 맞지 않는 토큰:" << tks[fl][f] << lexeme[fl][f] << "입력" << endl;
+        exit(100);
+    }
     cout << "Exit <factor>" << endl;
 }
 //<factor_tail> -> {<mult_op> <factor> <factor_tail>}
@@ -555,6 +567,10 @@ void factor_tail(vector<vector<int>> tks) {
         factor_tail(tks);
         cout << "Exit <factor_tail>" << endl;
     }
+    else {
+        cout << "조건에 맞지 않는 토큰:" << tks[fl][f] << lexeme[fl][f] << "입력" << endl;
+        exit(100);
+    }
 }
 //<const> -> any decimal numbers
 void const_(vector<vector<int>> tks) {
@@ -563,6 +579,10 @@ void const_(vector<vector<int>> tks) {
         if (fl != tks.size()-1 || f != tks[fl].size() - 1) {
             f++;
         }
+    }
+    else {
+        cout << "조건에 맞지 않는 토큰:" << tks[fl][f] << lexeme[fl][f] << "입력" << endl;
+        exit(100);
     }
     cout << "Exit <const>" << endl;
 }
@@ -574,6 +594,10 @@ void ident(vector<vector<int>> tks) {
             f++;
         }
     }
+    else {
+        cout << "조건에 맞지 않는 토큰:" << tks[fl][f] << lexeme[fl][f] << "입력" << endl;
+        exit(100);
+    }
     cout << "Exit <ident>" << endl;
 }
 //<assignment_op> -> :=
@@ -581,6 +605,10 @@ void assignment_op(vector<vector<int>> tks) {
     cout << "Enter <assignment_op>" << endl;
     if (tks[fl][f] == ASSIGN_OP) {
         f++;
+    }
+    else {
+        cout << "조건에 맞지 않는 토큰:" << tks[fl][f] << lexeme[fl][f] << "입력" << endl;
+        exit(100);
     }
     cout << "Exit <assignmnet_op>" << endl;
 }
@@ -593,6 +621,10 @@ void semi_colon(vector<vector<int>> tks) {
             fl++;
             f = 0;
         }
+    }
+    else {
+        cout << "조건에 맞지 않는 토큰:" << tks[fl][f] << lexeme[fl][f] << "입력" << endl;
+        exit(100);
     }
     cout << "Exit <semi_colon>" << endl;
 }
@@ -610,6 +642,10 @@ void add_op(vector<vector<int>> tks) {
     if (tks[fl][f] == ADD_OP) {
         f++;
     }
+    else {
+        cout << "조건에 맞지 않는 토큰:" << tks[fl][f] << lexeme[fl][f] << "입력" << endl;
+        exit(100);
+    }
     cout << "Exit <add_op>" << endl;
 }
 //<mult_op> -> (*|/)
@@ -626,6 +662,10 @@ void mult_op(vector<vector<int>> tks) {
     if (tks[fl][f] == MUL_OP) {
         f++;
     }
+    else {
+        cout << "조건에 맞지 않는 토큰:" << tks[fl][f] << lexeme[fl][f] << "입력" << endl;
+        exit(100);
+    }
     cout << "Exit <mult_op>" << endl;
 }
 //<left_paren> -> (
@@ -634,6 +674,10 @@ void left_paren(vector<vector<int>> tks) {
     if (tks[fl][f] == LPAREN) {
         f++;
     }
+    else {
+        cout << "조건에 맞지 않는 토큰:" << tks[fl][f] << lexeme[fl][f] << "입력" << endl;
+        exit(100);
+    }
     cout << "Exit <left_paren>" << endl;
 }
 //<right_paren> -> )
@@ -641,6 +685,10 @@ void right_paren(vector<vector<int>> tks) {
     cout << "Enter <right_paren>" << endl;
     if (tks[fl][f] == RPAREN) {
         f++;
+        cout << "Exit <right_paren>" << endl;
     }
-    cout << "Exit <right_paren>" << endl;
+    else {
+        cout << "조건에 맞지 않는 토큰:" << tks[fl][f] << lexeme[fl][f] << "입력" << endl;
+        exit(100);
+    }
 }
