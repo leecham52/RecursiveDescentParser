@@ -10,25 +10,33 @@
 #include <string.h>
 using namespace std;
 
-//아쉽지만, 전역변수로 받기
+//lexical 함수로 lexical analyze한 값을 token, lexeme 각각 2차원 벡터로 값을 저장
 vector<vector<int>> tokens;
 vector<vector<string>> lexeme;
+//lexical 함수로 token화 한 것을 가지고 Recursive Descent Parser과정을 가지면서 문법에 맞게 되는지 확인하기 위한 전역변수, 2차원으로 [fl][f] 
 int fl = 0;
 int f = 0;
+//warning, error를 표기
 vector<string> dup_op;
+int duo = 0;
 vector<string> error;
+//ident의 현재 값을 저장하기 위한 구조체
 struct Id {
     string id;
     int val;
 };
+//(,), *, / +,-는 계산하는데 있어 우선 순위가 있기에 이를 나타내주기 위한 구조체 
 struct op {
     string ope;
     int p;
 };
+//ident 현재 값 저장한 구조체의 vector
 vector<Id> ide;
+//ident에 대한 계산을 위한 stack
 stack<int> num;
 stack<op> oper;
 
+//terminal의 token 값, ident의 값이 UNKNOWN일 떄 표기
 #define IDENT 10
 #define CONST 11
 #define ASSIGN_OP 12
@@ -38,7 +46,7 @@ stack<op> oper;
 #define LPAREN 18
 #define RPAREN 19
 #define UNKNOWN -10000
-
+//lexical 함수에 필요한, check 함수들
 bool checkWhiteSpace(char c);
 bool checkLetter(char c);
 bool checkDigit(char c);
@@ -52,6 +60,7 @@ bool checkRparen(const char c[]);
 bool checkSemiColon(const char c[]);
 int checkToken(const char t[]);
 
+//Recursive Descent Parser를 Assignment1에 있는 조건에 맞게 함수화
 void program(vector<vector<int>> tks);
 void statements(vector<vector<int>> tks);
 void statement(vector<vector<int>> tks);
@@ -69,18 +78,20 @@ void mult_op(vector<vector<int>> tks);
 void left_paren(vector<vector<int>> tks);
 void right_paren(vector<vector<int>> tks);
 
+//lexical analyzer 함수
 void lexical(string str);
+//id 계산의 세부 함수, stack의 맨 위에 있는 두 숫자에 대한 계산을 하고, stack oper 맨 위의 operator로 결과를 stack에 저장
 void calString();
+//Recursive Descent Parser에 알맞은 lexeme들에 대해서 각 id에 대한 계산
 void calIdent(vector<vector<int>> tk, vector<vector<string>> lex, vector<Id>& ident);
+//일련의 과정을 거친 후 Assignment1의 출력에 맞춰서 출력
 void printResult(vector<vector<int>> tk, vector<vector<string>> lex);
 
 
 int main(int argc, char* argv[]) {
-
     string in;
-
-    //c++에 맞춰서 변환, string으로 낑겨 받으면 좋을수도 아닐수도
-    ifstream in_Fp("input.txt");
+    ifstream in_Fp;
+    in_Fp.open(argv[1]);
     if (!in_Fp.is_open()) {
         cout << "ERROR - cannot open front.in" << endl;
         return 0;
@@ -88,9 +99,11 @@ int main(int argc, char* argv[]) {
     while (!in_Fp.eof()) {
         getline(in_Fp, in); //한 줄씩 입력 받음
         lexical(in);
+        duo++;
     }
     in_Fp.close();
-    program(tokens); //RecursiveDescentParser 하기
+
+    program(tokens);
     calIdent(tokens, lexeme, ide);
     printResult(tokens, lexeme);
 
@@ -99,11 +112,11 @@ int main(int argc, char* argv[]) {
 
 void lexical(string str) {
     int next_token = 0;
-    string tok;
-    string notLit;
-    string token_string;
-    vector<string> lex;
-    vector<int> n_t;
+    string tok; //identifier, const만 받아와서 저장하는 string
+    string notLit; // :=,+,-,*,/,(,) 저장하는 string
+    string token_string; //문자열 변수, ascii 32 이하 값들을 무시한 string
+    vector<string> lex; //한 줄에 대한 lexeme
+    vector<int> n_t; //한 줄에 대한 token
     lex.clear();
     n_t.clear();
     for (int i = 0; i < str.length(); i++) {
@@ -126,6 +139,7 @@ void lexical(string str) {
             lex.push_back(tok);
             n_t.push_back(next_token);
         }
+        //notLit에 notLiteral한 것들 저장
         if (token_string[i] == ':') {
             notLit += token_string[i];
             i++;
@@ -134,11 +148,12 @@ void lexical(string str) {
                 i++;
             }
         }
+        //++,--,**,// 처럼 중복 연산자가 나오면 오류난 곳을 dup_op에 저장하고, lexeme은 1개만 저장
         else if (token_string[i] == '+') {
             notLit += token_string[i];
             i++;
             if (token_string[i] == '+') {
-                notLit += token_string[i];
+                dup_op.push_back(char(duo) + notLit);
                 i++;
             }
         }
@@ -146,7 +161,7 @@ void lexical(string str) {
             notLit += token_string[i];
             i++;
             if (token_string[i] == '-') {
-                notLit += token_string[i];
+                dup_op.push_back(char(duo) + notLit);
                 i++;
             }
         }
@@ -154,7 +169,7 @@ void lexical(string str) {
             notLit += token_string[i];
             i++;
             if (token_string[i] == '*') {
-                notLit += token_string[i];
+                dup_op.push_back(char(duo) + notLit);
                 i++;
             }
         }
@@ -162,7 +177,7 @@ void lexical(string str) {
             notLit += token_string[i];
             i++;
             if (token_string[i] == '/') {
-                notLit += token_string[i];
+                dup_op.push_back(char(duo) + notLit);
                 i++;
             }
         }
@@ -203,7 +218,9 @@ void calIdent(vector<vector<int>> tk, vector<vector<string>> lex, vector<Id>& id
     //ident 계산
     for (int k = 0; k < tk.size(); k++) {
         for (int i = 2; i < tk[k].size(); i++) {
+            //ident가 assignment 우측에 나올때, ide vector안에 있는게 아니면, Unknown을 넣어준다. 
             if (tk[k][i] == IDENT) {
+                //우측에 나왔지만, ide vector에 없는 경우, 첫 줄만 해당된다.
                 if (ident.size() == 0) {
                     num.push(UNKNOWN);
                     ident.push_back({ lex[k][i], UNKNOWN });
@@ -211,11 +228,13 @@ void calIdent(vector<vector<int>> tk, vector<vector<string>> lex, vector<Id>& id
                 }
                 for (int j = 0; j < ident.size(); j++) {
                     int l = 0;
+                    //ide 안에 저장되어 있으면 num stack에 ident val를 넣는다.
                     if (lex[k][i] == ident[j].id) {
                         num.push(ident[j].val);
                     }
                     else {
                         l++;
+                        //ide안에 있는 ident가 안 나왔을 때
                         if (l == ident.size()) {
                             num.push(UNKNOWN);
                             ident.push_back({ lex[k][i], UNKNOWN });
@@ -248,15 +267,16 @@ void calIdent(vector<vector<int>> tk, vector<vector<string>> lex, vector<Id>& id
                 else if (lex[k][i] == "+" || lex[k][i] == "-") {
                     pr = 1;
                 }
+                //*,/가 +,-보다 먼저 계산되어야 하기 때문에, 즉 stack의 위쪽에 있게 해서 pr <= oper.top().p가 들어간 것이다.
                 while (!oper.empty() && pr <= oper.top().p) {
                     calString();
                 }
                 oper.push({ lex[k][i], pr });
             }
-            else if (tk[k][i] == LPAREN) {
+            else if (tk[k][i] == LPAREN) { // ( )안에 있는 게 계산이 먼저 된다. 
                 oper.push({ lex[k][i], 0 });
             }
-            else if (tk[k][i] == RPAREN) {
+            else if (tk[k][i] == RPAREN) { // )가 오면 계산 시작, (가 나올때 까지만 한다.
                 while (oper.top().ope != "(") {
                     calString();
                 }
@@ -267,7 +287,17 @@ void calIdent(vector<vector<int>> tk, vector<vector<string>> lex, vector<Id>& id
             calString();
         }
         if (tk[k][0] == IDENT) {
-            ident.push_back({ lex[k][0], num.top() });
+            int ni = 0;
+            for(int u = 0; u < ident.size(); u++){
+                if(ident[u].id == lex[k][0]){
+                    ident[u].val = num.top();
+                    ni = 1;
+                    break;
+                }
+            }
+            if(ni == 0){
+                ident.push_back({ lex[k][0], num.top() });
+            }
             num.pop();
         }
     }
@@ -677,14 +707,6 @@ void semi_colon(vector<vector<int>> tks) {
 void add_op(vector<vector<int>> tks) {
     if (tks[fl].size() != f) {
         cout << "Enter <add_op>" << endl;
-        if (lexeme[fl][f] == "++") {
-            lexeme[fl][f] = "+";
-            dup_op.push_back(char(fl) + lexeme[fl][f]);
-        }
-        else if (lexeme[fl][f] == "--") {
-            lexeme[fl][f] = "-";
-            dup_op.push_back(char(fl) + lexeme[fl][f]);
-        }
         if (tks[fl][f] == ADD_OP) {
             f++;
         }
@@ -702,14 +724,6 @@ void add_op(vector<vector<int>> tks) {
 void mult_op(vector<vector<int>> tks) {
     if (tks[fl].size() != f) {
         cout << "Enter <mult_op>" << endl;
-        if (lexeme[fl][f] == "**") {
-            lexeme[fl][f] = "*";
-            dup_op.push_back(char(fl) + lexeme[fl][f]);
-        }
-        else if (lexeme[fl][f] == "//") {
-            lexeme[fl][f] = "/";
-            dup_op.push_back(char(fl) + lexeme[fl][f]);
-        }
         if (tks[fl][f] == MUL_OP) {
             f++;
         }
