@@ -45,7 +45,7 @@ stack<op> oper;
 #define MUL_OP 16
 #define LPAREN 18
 #define RPAREN 19
-#define UNKNOWN -10000
+#define UNKNOWN -99999
 //lexical 함수에 필요한, check 함수들
 bool checkWhiteSpace(char c);
 bool checkLetter(char c);
@@ -112,83 +112,101 @@ int main(int argc, char* argv[]) {
 
 void lexical(string str) {
     int next_token = 0;
-    string tok; //identifier, const만 받아와서 저장하는 string
-    string notLit; // :=,+,-,*,/,(,) 저장하는 string
-    string token_string; //문자열 변수, ascii 32 이하 값들을 무시한 string
+    string token_string;
     vector<string> lex; //한 줄에 대한 lexeme
     vector<int> n_t; //한 줄에 대한 token
     lex.clear();
     n_t.clear();
-    for (int i = 0; i < str.length(); i++) {
-        if (!checkWhiteSpace(str[i])) {
-            token_string += str[i]; //공백을 뺀 줄을 가져온다. id1 = id2 + 2; => id1=id2+2;
+    for (int i = 0; i < str.length();) {
+        token_string.clear();
+        //ascii 32이하 값은 무시한다.
+        if (checkWhiteSpace(str[i])) {
+            i++;
         }
-    }
-    for (int i = 0; i < token_string.length();) {
-        tok.clear();
-        notLit.clear();
+        else {
+            //identifier, const 2가지 경우를 걸러서 저장한다.
+            while ((checkLetter(str[i]) || checkDigit(str[i]) || str[i] == '_')) {
+                token_string += str[i];
+                i++;
+            }
 
-        //identifier, const 2가지 경우를 걸러서 저장
-        while ((checkLetter(token_string[i]) || checkDigit(token_string[i]) || token_string[i] == '_')) {
-            tok += token_string[i];
-            i++;
-        }
-        next_token = checkToken(tok.c_str()); // 여기서 identifier, const 걸러서 token화된다.
-        //lexeme이랑 token을 어딘가 저장을 해둬야한다.
-        if (!tok.empty() && next_token != 0) {
-            lex.push_back(tok);
-            n_t.push_back(next_token);
-        }
-        //notLit에 notLiteral한 것들 저장
-        if (token_string[i] == ':') {
-            notLit += token_string[i];
-            i++;
-            if (token_string[i] == '=') {
-                notLit += token_string[i];
+            next_token = checkToken(token_string.c_str()); // 여기서 identifier, const(양수) 걸러서 token화된다.
+            //lexeme이랑 token을 어딘가 저장을 해둬야한다.
+            if (!token_string.empty() && next_token != 0) {
+                lex.push_back(token_string);
+                n_t.push_back(next_token);
+            }
+            if (!token_string.empty()) {
+                token_string.clear();
+            }
+            //const(음수) token화
+            if (str[i] == '-'&& checkDigit(str[i+1])) {
+                token_string += str[i];
+                i++;
+                while (checkDigit(str[i])) {
+                    token_string += str[i];
+                    i++;
+                }
+                next_token = checkToken(token_string.c_str());
+                if (!token_string.empty() && next_token != 0) {
+                    lex.push_back(token_string);
+                    n_t.push_back(next_token);
+                }
+                if (!token_string.empty()) {
+                    token_string.clear();
+                }
+            }
+            //notLiteral한 것들 저장
+            if (str[i] == ':') {
+                token_string += str[i];
+                i++;
+                if (str[i] == '=') {
+                    token_string += str[i];
+                    i++;
+                }
+            }
+            //++,--,**,// 처럼 중복 연산자가 나오면 오류난 곳을 dup_op에 저장하고, lexeme은 1개만 저장
+            else if (str[i] == '+') {
+                token_string += str[i];
+                i++;
+                if (str[i] == '+') {
+                    dup_op.push_back(char(duo) + token_string);
+                    i++;
+                }
+            }
+            else if (str[i] == '-' && !checkDigit(str[i + 1])) {
+                token_string += str[i];
+                i++;
+                if (str[i] == '-') {
+                    dup_op.push_back(char(duo) + token_string);
+                    i++;
+                }
+            }
+            else if (str[i] == '*') {
+                token_string += str[i];
+                i++;
+                if (str[i] == '*') {
+                    dup_op.push_back(char(duo) + token_string);
+                    i++;
+                }
+            }
+            else if (str[i] == '/') {
+                token_string += str[i];
+                i++;
+                if (str[i] == '/') {
+                    dup_op.push_back(char(duo) + token_string);
+                    i++;
+                }
+            }
+            else if (str[i] == '(' || str[i] == ')' || str[i] == ';') {
+                token_string += str[i];
                 i++;
             }
-        }
-        //++,--,**,// 처럼 중복 연산자가 나오면 오류난 곳을 dup_op에 저장하고, lexeme은 1개만 저장
-        else if (token_string[i] == '+') {
-            notLit += token_string[i];
-            i++;
-            if (token_string[i] == '+') {
-                dup_op.push_back(char(duo) + notLit);
-                i++;
+            next_token = checkToken(token_string.c_str());
+            if (!token_string.empty() && next_token != 0) {
+                lex.push_back(token_string);
+                n_t.push_back(next_token);
             }
-        }
-        else if (token_string[i] == '-') {
-            notLit += token_string[i];
-            i++;
-            if (token_string[i] == '-') {
-                dup_op.push_back(char(duo) + notLit);
-                i++;
-            }
-        }
-        else if (token_string[i] == '*') {
-            notLit += token_string[i];
-            i++;
-            if (token_string[i] == '*') {
-                dup_op.push_back(char(duo) + notLit);
-                i++;
-            }
-        }
-        else if (token_string[i] == '/') {
-            notLit += token_string[i];
-            i++;
-            if (token_string[i] == '/') {
-                dup_op.push_back(char(duo) + notLit);
-                i++;
-            }
-        }
-        else if (token_string[i] == '(' || token_string[i] == ')' || token_string[i] == ';') {
-            notLit += token_string[i];
-            i++;
-        }
-        next_token = checkToken(notLit.c_str());
-        if (!notLit.empty() && next_token != 0) {
-            lex.push_back(notLit);
-            n_t.push_back(next_token);
         }
     }
     //2차원 vector에 저장
@@ -206,7 +224,10 @@ void calString() {
     if (operate == "*")
         result = a * b;
     else if (operate == "/")
-        result = a / b;
+        if (b == 0)
+            result = 0;
+        else
+            result = a / b;
     else if (operate == "+")
         result = a + b;
     else if (operate == "-")
@@ -214,7 +235,7 @@ void calString() {
     num.push(result);
 }
 void calIdent(vector<vector<int>> tk, vector<vector<string>> lex, vector<Id>& ident) {
-    vector<string> e = error;
+    int is_unknown = 0;
     //ident 계산
     for (int k = 0; k < tk.size(); k++) {
         for (int i = 2; i < tk[k].size(); i++) {
@@ -226,8 +247,8 @@ void calIdent(vector<vector<int>> tk, vector<vector<string>> lex, vector<Id>& id
                     ident.push_back({ lex[k][i], UNKNOWN });
                     error.push_back(to_string(k) + lex[k][i]);
                 }
+                int l = 0;
                 for (int j = 0; j < ident.size(); j++) {
-                    int l = 0;
                     //ide 안에 저장되어 있으면 num stack에 ident val를 넣는다.
                     if (lex[k][i] == ident[j].id) {
                         num.push(ident[j].val);
@@ -238,13 +259,16 @@ void calIdent(vector<vector<int>> tk, vector<vector<string>> lex, vector<Id>& id
                         if (l == ident.size()) {
                             num.push(UNKNOWN);
                             ident.push_back({ lex[k][i], UNKNOWN });
+                            is_unknown = 1;
+                            if (error.size() == 0) {
+                                error.push_back(to_string(k) + lex[k][i]);
+                            }
                             for (int c = 0; c < error.size(); c++) {
                                 string getE = error[c];
                                 for (int b = 1; b < getE.size(); b++) {
                                     error[c].erase(0);
                                     error[c] += getE[b];
                                 }
-                                cout << error[c].front();
                                 if (lex[k][i] != error[c]) {
                                     error.push_back(to_string(k) + lex[k][i]);
                                     error[c] = getE;
@@ -290,10 +314,17 @@ void calIdent(vector<vector<int>> tk, vector<vector<string>> lex, vector<Id>& id
             int ni = 0;
             //이미 있는 ident에 대해서 새로 정의될 때,
             for (int u = 0; u < ident.size(); u++) {
-                if (ident[u].id == lex[k][0]) {
-                    ident[u].val = num.top();
+                if (ident[u].val == UNKNOWN) { //이미 들어가 있는 게 UNKNOWN이면, 그 뒤는 다 UNKNOWN
+                    ident.push_back({ lex[k][0], UNKNOWN });
                     ni = 1;
                     break;
+                }
+                else {
+                    if (ident[u].id == lex[k][0]) {
+                        ident[u].val = num.top();
+                        ni = 1;
+                        break;
+                    }
                 }
             }
             if (ni == 0) {
@@ -342,7 +373,7 @@ void printResult(vector<vector<int>> tk, vector<vector<string>> lex) {
             for (int v = 0; v < error.size(); v++) {
                 string errP;
                 errP = error[v].front();
-                if (errP[0] - '0' == char(k)) {
+                if (errP[0] - '0' == char(k)) { // ascii 코드가 48 차이가 나서 - '0'
                     errP.clear();
                     for (int b = 1; b < error[v].size(); b++) {
                         errP += error[v][b];
@@ -362,7 +393,7 @@ void printResult(vector<vector<int>> tk, vector<vector<string>> lex) {
     //Result 
     cout << "Result ==> ";
     for (int n = 0; n < ide.size(); n++) {
-        if (ide[n].val < 0 || ide[n].val > 10000) {
+        if (ide[n].val == UNKNOWN) {
             if (n == ide.size() - 1) {
                 cout << ide[n].id << ": Unknown";
             }
@@ -418,16 +449,32 @@ bool checkIdent(const char c[]) {
 }
 //const인지 확인
 bool checkConst(const char c[]) {
-    if (c[0] == '0' && (int)strlen(c) == 1) { //0일때
+    if (c[0] == '0' && (int)strlen(c) == 1) { // 0일때
         return true;
     }
-    if (checkDigit(c[0]) && c[0] != '0') {
+    if (c[0] == '0' && (int)strlen(c) != 1) { // 숫자를 쓸 때 0으로 시작하는 건 아니기 때문에, ex) 0123 같은건 false
+        return  false;
+    }
+    if (c[0] == '-') { //음수 확인
+        if (c[1] == '0') { // -0은 안 써서 false
+            return false;
+        }
+        for (int i = 1; i < (int)strlen(c); i++) {
+            if (!checkDigit(c[i])) { //- 이후에는 숫자가 와야한다.
+                return false;
+            }
+            return true;
+        }
+    }
+    if (checkDigit(c[0]) && c[0] != '0') { //양수 확인
         for (int i = 1; i <= (int)strlen(c); i++) {
             if (checkDigit(c[i])) {
                 continue;
             }
-            else if (c[i] == '\0') return true;
-            else return false;
+            else if (c[i] == '\0')
+                return true;
+            else
+                return false;
         }
     }
     return false;
