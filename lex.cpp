@@ -289,14 +289,14 @@ void calIdent(vector<vector<int>> tk, vector<vector<string>> lex, vector<Id>& id
         if (tk[k][0] == IDENT) {
             int ni = 0;
             //이미 있는 ident에 대해서 새로 정의될 때,
-            for(int u = 0; u < ident.size(); u++){
-                if(ident[u].id == lex[k][0]){
+            for (int u = 0; u < ident.size(); u++) {
+                if (ident[u].id == lex[k][0]) {
                     ident[u].val = num.top();
                     ni = 1;
                     break;
                 }
             }
-            if(ni == 0){
+            if (ni == 0) {
                 ident.push_back({ lex[k][0], num.top() });
             }
             num.pop();
@@ -354,7 +354,7 @@ void printResult(vector<vector<int>> tk, vector<vector<string>> lex) {
             }
         }
         //둘 다 아니면, ok 출력
-        if(ew == 0){
+        if (ew == 0) {
             cout << "(OK)" << endl;
         }
         //OK, WARNING, Error
@@ -504,20 +504,16 @@ int checkToken(const char t[]) {
 //Assignment 1 조건에 맞는 Recursive-Descent Parsing
 //<program> -> <statements>
 void program(vector<vector<int>> tks) {
-    cout << "Enter <program>" << endl;
     statements(tks);
-    cout << "Exit <program>" << endl;
 }
 //<statements> -> <statement> {<semi_colon><statements}
 void statements(vector<vector<int>> tks) {
-    cout << "Enter <statements>" << endl;
     statement(tks);
     if (tks[fl].size() != f) {
         if (tokens[fl][f] == SEMI_COLON) {
             semi_colon(tks);
             statements(tks);
         }
-        cout << "Exit <statements>" << endl;
     }
     else {
         if (tks.size() != fl) {
@@ -529,35 +525,27 @@ void statements(vector<vector<int>> tks) {
 }
 //<statement> -> <ident> <assignment_op> <expression>
 void statement(vector<vector<int>> tks) {
-    cout << "Enter <statement>" << endl;
     ident(tks);
     assignment_op(tks);
     expression(tks);
-    cout << "Exit <statement>" << endl;
 }
 //<expression> -> <term> <term_tail>
 void expression(vector<vector<int>> tks) {
-    cout << "Enter <expression>" << endl;
     term(tks);
     term_tail(tks);
-    cout << "Exit <expression>" << endl;
 }
 //<term> -> <factor> <factor_tail>
 void term(vector<vector<int>> tks) {
-    cout << "Enter <term>" << endl;
     factor(tks);
     factor_tail(tks);
-    cout << "Exit <term>" << endl;
 }
 //<term_tail> -> {<add_op> <term> <term_tail>}
 void term_tail(vector<vector<int>> tks) {
     if (tks[fl].size() != f) {
         if (tks[fl][f] == ADD_OP) {
-            cout << "Enter <term_tail>" << endl;
             add_op(tks);
             term(tks);
             term_tail(tks);
-            cout << "Exit <term_tail>" << endl;
         }
     }
     else {
@@ -570,7 +558,6 @@ void term_tail(vector<vector<int>> tks) {
 //<factor> -> (<left_paren> <expression> <right_paren> | <ident> | <const>)
 void factor(vector<vector<int>> tks) {
     if (tks[fl].size() != f) {
-        cout << "Enter <factor>" << endl;
         if (tks[fl][f] == LPAREN) {
             left_paren(tks);
             expression(tks);
@@ -587,7 +574,6 @@ void factor(vector<vector<int>> tks) {
             exit(100);
             return;
         }
-        cout << "Exit <factor>" << endl;
     }
     else {
         if (tks.size() != fl) {
@@ -599,13 +585,11 @@ void factor(vector<vector<int>> tks) {
 }
 //<factor_tail> -> {<mult_op> <factor> <factor_tail>}
 void factor_tail(vector<vector<int>> tks) {
-    cout << "Enter <factor_tail>" << endl;
     if (tks[fl].size() != f) {
         if (tks[fl][f] == MUL_OP) {
             mult_op(tks);
             factor(tks);
             factor_tail(tks);
-            cout << "Exit <factor_tail>" << endl;
         }
     }
     else {
@@ -619,13 +603,11 @@ void factor_tail(vector<vector<int>> tks) {
 //<const> -> any decimal numbers
 void const_(vector<vector<int>> tks) {
     if (tks[fl].size() != f) {
-        cout << "Enter <const>" << endl;
         if (tks[fl][f] == CONST) {
             if (fl != tks.size() - 1 || f != tks[fl].size() - 1) {
                 f++;
             }
         }
-        cout << "Exit <const>" << endl;
     }
     else {
         if (tks.size() != fl) {
@@ -639,13 +621,11 @@ void const_(vector<vector<int>> tks) {
 //<ident> -> any names conforming to C id rules
 void ident(vector<vector<int>> tks) {
     if (tks[fl].size() != f) {
-        cout << "Enter <ident>" << endl;
         if (tks[fl][f] == IDENT) {
             if (fl != tks.size() - 1 || f != tks[fl].size() - 1) {
                 f++;
             }
         }
-        cout << "Exit <ident>" << endl;
     }
     else {
         if (tks.size() != fl) {
@@ -658,11 +638,9 @@ void ident(vector<vector<int>> tks) {
 //<assignment_op> -> :=
 void assignment_op(vector<vector<int>> tks) {
     if (tks[fl].size() != f) {
-        cout << "Enter <assignment_op>" << endl;
         if (tks[fl][f] == ASSIGN_OP) {
             f++;
         }
-        cout << "Exit <assignmnet_op>" << endl;
     }
     else {
         if (tks.size() != fl) {
@@ -676,14 +654,12 @@ void assignment_op(vector<vector<int>> tks) {
 //여기서 줄이 바뀐다, 2차원 배열이 바뀌는 것,
 void semi_colon(vector<vector<int>> tks) {
     if (tks[fl].size() != f) {
-        cout << "Enter <semi_colon>" << endl;
         if (tks[fl][f] == SEMI_COLON) {
             if (tks[fl].size() == f + 1) { // 배열 길이, 
                 fl++;
                 f = 0;
             }
         }
-        cout << "Exit <semi_colon>" << endl;
     }
     else {
         if (tks.size() != fl) {
@@ -696,11 +672,9 @@ void semi_colon(vector<vector<int>> tks) {
 //<add_op> -> (+|-)
 void add_op(vector<vector<int>> tks) {
     if (tks[fl].size() != f) {
-        cout << "Enter <add_op>" << endl;
         if (tks[fl][f] == ADD_OP) {
             f++;
         }
-        cout << "Exit <add_op>" << endl;
     }
     else {
         if (tks.size() != fl) {
@@ -713,11 +687,9 @@ void add_op(vector<vector<int>> tks) {
 //<mult_op> -> (*|/)
 void mult_op(vector<vector<int>> tks) {
     if (tks[fl].size() != f) {
-        cout << "Enter <mult_op>" << endl;
         if (tks[fl][f] == MUL_OP) {
             f++;
         }
-        cout << "Exit <mult_op>" << endl;
     }
     else {
         if (tks.size() != fl) {
@@ -730,11 +702,9 @@ void mult_op(vector<vector<int>> tks) {
 //<left_paren> -> (
 void left_paren(vector<vector<int>> tks) {
     if (tks[fl].size() != f) {
-        cout << "Enter <left_paren>" << endl;
         if (tks[fl][f] == LPAREN) {
             f++;
         }
-        cout << "Exit <left_paren>" << endl;
     }
     else {
         if (tks.size() != fl) {
@@ -747,10 +717,8 @@ void left_paren(vector<vector<int>> tks) {
 //<right_paren> -> )
 void right_paren(vector<vector<int>> tks) {
     if (tks[fl].size() != f) {
-        cout << "Enter <right_paren>" << endl;
         if (tks[fl][f] == RPAREN) {
             f++;
-            cout << "Exit <right_paren>" << endl;
         }
     }
     else {
